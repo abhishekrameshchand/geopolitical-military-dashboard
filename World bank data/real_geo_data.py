@@ -187,15 +187,14 @@ with tab1:
             
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # High contrast tactical orange map scale
+        # FIXED: Using 100% safe standard Plotly color scale (YlOrRd to match Amber theme)
         fig_map = px.choropleth(df_mil, locations="name", locationmode="country names",
                                 color="Value", hover_name="name",
-                                color_continuous_scale=px.colors.sequential.Sunsetdark)
+                                color_continuous_scale=px.colors.sequential.YlOrRd)
         fig_map.update_layout(**stealth_plotly_layout)
         fig_map.update_layout(height=340, geo=dict(bgcolor='rgba(0,0,0,0)', showframe=False))
         st.plotly_chart(fig_map, use_container_width=True, config={'displayModeBar': False})
         
-        # NEW FEATURE ADDED: Regional Distribution Donut Chart
         st.markdown("### 🍩 Continental Allocation Share")
         df_region = df_mil.groupby('region')['Value'].mean().reset_index()
         fig_donut = px.pie(df_region, values='Value', names='region', hole=0.4,
@@ -213,9 +212,12 @@ with tab2:
     df_arms = get_wb_data('MS.MIL.MPRT.KD', selected_year)
     if isinstance(df_arms, pd.DataFrame) and not df_arms.empty:
         df_arms_top10 = df_arms.sort_values(by='Value', ascending=False).head(10)
+        
+        # FIXED: Removed 'Onyx' and replaced with safe universally supported 'Magma'
         fig_arms = px.bar(df_arms_top10, x='Value', y='name', color='Value', orientation='h',
-                          color_continuous_scale=px.colors.sequential.Onyx,
+                          color_continuous_scale=px.colors.sequential.Magma,
                           labels={'Value': 'Import Volume (Constant USD)', 'name': ''})
+        
         fig_arms.update_layout(**stealth_plotly_layout)
         fig_arms.update_layout(height=360, coloraxis_showscale=False, yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig_arms, use_container_width=True, config={'displayModeBar': False})
@@ -223,7 +225,7 @@ with tab2:
         st.warning("No arms trade records mapped.")
 
 # ==========================================
-# TAB 3: AI TREND FORECASTING MATRIX (UPGRADED LOGIC)
+# TAB 3: AI TREND FORECASTING MATRIX
 # ==========================================
 with tab3:
     if isinstance(df_mil, pd.DataFrame) and not df_mil.empty:
@@ -247,7 +249,6 @@ with tab3:
             df_comp = hist_df[hist_df[h_c].isin([country_a, country_b])].dropna()
             df_comp = df_comp.rename(columns={h_val: 'Spend', 'date': 'Year'})
             df_comp['Year'] = df_comp['Year'].astype(int)
-            # Filter to modern timeframe for cleaner polynomial accuracy
             df_comp = df_comp[df_comp['Year'] >= 2005]
             
             forecast_data = []
@@ -257,21 +258,18 @@ with tab3:
                     X = c_df['Year'].values
                     y = c_df['Spend'].values
                     
-                    # UPGRADED LOGIC: Polynomial Fit (Degree 2) to capture variance curves instead of flat lines
                     poly_coefficients = np.polyfit(X, y, 2)
                     poly_model = np.poly1d(poly_coefficients)
                     
                     for idx, row in c_df.iterrows():
                         forecast_data.append({'Year': row['Year'], 'Spend': row['Spend'], 'Country': country, 'Type': 'Historical'})
                     
-                    # Dynamic curve plotting through 2030
                     for future_year in range(2023, 2031):
                         pred_val = max(0.05, poly_model(future_year))
                         forecast_data.append({'Year': future_year, 'Spend': pred_val, 'Country': country, 'Type': 'AI Curved Forecast'})
             
             if forecast_data:
                 df_forecast = pd.DataFrame(forecast_data)
-                # Tactical Gold vs Clean Mint Green tracking lines
                 fig_trend = px.line(df_forecast, x='Year', y='Spend', color='Country', line_dash='Type',
                                     color_discrete_sequence=['#F59E0B', '#10B981'],
                                     labels={'Spend': 'Allocation Volume (% GDP)'})
