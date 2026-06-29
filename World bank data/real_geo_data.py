@@ -1,48 +1,44 @@
 import pandas as pd
 import world_bank_data as wb
 import plotly.express as px
+import streamlit as st  # <-- Streamlit ko import kiya
 
-print("World Bank se live data fetch ho raha hai... Isme thoda samay lag sakta hai.")
+# Streamlit ki screen par title aur loading message dikhana
+st.title("Geopolitical & Military Dashboard")
+status_text = st.empty()
+status_text.write("🔄 World Bank se live data fetch ho raha hai... Isme thoda samay lag sakta hai.")
 
-# 1. World Bank se military expenditure ka data lena
+# 1. Data lena
 mil_series = wb.get_series('MS.MIL.XPND.GD.ZS', date='2022', id_or_value='value')
 mil_gdp = mil_series.reset_index()
 
-# Debugging ke liye terminal me columns print karte hain
-print("Humne mil_gdp me ye columns paye:", list(mil_gdp.columns))
-
-# 2. Sabse aakhri column ka naam badal kar 'Military_Share_of_GDP' rakhna
-# Kyunki value hamesha aakhri column me hi hoti hai
+# 2. Column rename karna
 value_col = mil_gdp.columns[-1]
 mil_gdp = mil_gdp.rename(columns={value_col: 'Military_Share_of_GDP'})
 
-# 3. Deshon ki list aur unke regions load karna
+# 3. Countries load karna
 countries = wb.get_countries().reset_index()
 
-# 4. Automatically dhundhna ki kis column me deshon ke naam hain
+# 4. Column match karna
 match_col = None
 for col in mil_gdp.columns:
     if str(col).lower() in ['country', 'name']:
         match_col = col
         break
 
-# Agar 'country' naam ka column nahi mila, toh pehle column ko hi use kar lenge
 if not match_col:
     match_col = mil_gdp.columns[0]
 
-print(f"Dono tables ko '{match_col}' column ke basis par merge kiya ja raha hai...")
-
-# 5. Data ko safe tarike se merge karna
+# 5. Merge karna
 df = pd.merge(countries[['region', 'name']], mil_gdp, left_on='name', right_on=match_col)
 
-# 6. Data clean karna (Missing values hatana)
+# 6. Clean karna
 df = df.dropna(subset=['Military_Share_of_GDP'])
 df = df[df['region'] != 'Aggregates']
-
-# Top 20 deshon ko nikalna
 df_top20 = df.sort_values(by='Military_Share_of_GDP', ascending=False).head(20)
 
-print("Data process ho gaya. Ab graph save ho raha hai...")
+# Loading message hata kar graph dikhana
+status_text.empty()
 
 # 7. Interactive Bar Chart banana
 fig = px.bar(df_top20, 
@@ -55,6 +51,5 @@ fig = px.bar(df_top20,
 
 fig.update_layout(yaxis={'categoryorder':'total ascending'})
 
-# HTML file me save karna
-fig.write_html("real_military_graph.html")
-print("Done! 'real_military_graph.html' ab tayar hai.")
+# HTML file me save karne ke sath-sath Streamlit par graph show karna
+st.plotly_chart(fig, use_container_width=True)
