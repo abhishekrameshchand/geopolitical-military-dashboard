@@ -49,7 +49,21 @@ fig = px.bar(df_top20,
              title='Top 20 Countries by Military Expenditure (% of GDP) in 2022',
              labels={'Military_Share_of_GDP': 'Military Spend (% of GDP)', 'name': 'Country'})
 
-fig.update_layout(yaxis={'categoryorder':'total ascending'})
+# Layout ko mobile-friendly banana
+fig.update_layout(
+    yaxis={'categoryorder':'total ascending'},
+    height=600,  # Fix height taaki mobile par achhe se scroll ho
+    margin=dict(l=20, r=20, t=40, b=20),  # Margins kam kiye taaki space bache
+    legend=dict(
+        orientation="h",  # Legend ko horizontal (h) kiya
+        yanchor="bottom",
+        y=-0.3,  # Graph ke neeche shift kiya
+        xanchor="center",
+        x=0.5
+    )
+)
 
+# HTML file me save karne ke sath-sath Streamlit par graph show karna
+st.plotly_chart(fig, use_container_width=True)
 # HTML file me save karne ke sath-sath Streamlit par graph show karna
 st.plotly_chart(fig, use_container_width=True)
