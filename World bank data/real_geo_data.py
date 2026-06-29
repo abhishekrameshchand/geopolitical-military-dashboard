@@ -14,30 +14,28 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# --- FORCE INJECTING TRANSPARENT LAYERS ON ALL OVERRIDE BLOCKS ---
 st.markdown("""
     <style>
-    /* Premium High-Contrast Space UI Background */
-    [data-testid="stAppViewContainer"] {
-        background: radial-gradient(circle at 50% 10%, #1A2333 0%, #090D14 70%);
-        color: #F3F4F6;
-    }
-    [data-testid="stHeader"] {
-        background: transparent;
+    /* Force background gradient across ALL layout layers */
+    [data-testid="stAppViewContainer"], .main, [data-testid="stHeader"] {
+        background: radial-gradient(circle at 50% 15%, #1F293D 0%, #0B0F17 85%) !important;
+        color: #F3F4F6 !important;
     }
     
-    /* Modern SaaS Container Cards with Neon Accents */
+    /* Modern SaaS Container Cards with Blue Neon Accents */
     .metric-card {
-        background: rgba(22, 29, 42, 0.85);
-        border: 1px solid rgba(59, 130, 246, 0.2);
+        background: rgba(22, 29, 42, 0.85) !important;
+        border: 1px solid rgba(59, 130, 246, 0.25) !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         border-radius: 12px;
         padding: 20px;
         margin-bottom: 12px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.3s ease;
     }
     .metric-card:hover {
-        border-color: #3B82F6;
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        border-color: #3B82F6 !important;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.35) !important;
         transform: translateY(-2px);
     }
     .metric-title {
@@ -52,7 +50,6 @@ st.markdown("""
         font-size: 28px;
         font-weight: 800;
         margin-top: 4px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
     .metric-delta {
         font-size: 13px;
@@ -68,25 +65,16 @@ st.markdown("""
         border-radius: 4px 12px 12px 4px;
         padding: 18px;
         margin-bottom: 14px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
     .news-title {
         color: #F3F4F6;
         font-size: 16px;
         font-weight: 600;
-        margin-bottom: 6px;
     }
     .news-desc {
         color: #9CA3AF;
         font-size: 13px;
         line-height: 1.5;
-        margin-bottom: 10px;
-    }
-    .news-meta {
-        display: flex;
-        justify-content: space-between;
-        font-size: 11px;
-        color: #6B7280;
     }
     .news-link {
         color: #3B82F6;
@@ -154,7 +142,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 df_mil = get_wb_data('MS.MIL.XPND.GD.ZS', selected_year)
 
-# Plotly styling matrix optimized for vibrant visibility
 vibrant_plotly_layout = {
     "template": "plotly_dark",
     "paper_bgcolor": "rgba(0,0,0,0)",
@@ -171,7 +158,6 @@ with tab1:
         top_country = df_mil.sort_values(by='Value', ascending=False).iloc[0]
         global_mean = df_mil['Value'].mean()
         
-        # High-Fidelity UI Grid Render
         m_col1, m_col2, m_col3 = st.columns([1, 1, 1])
         with m_col1:
             st.markdown(f"""<div class="metric-card">
@@ -194,7 +180,6 @@ with tab1:
             
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # Global Map Layout
         fig_map = px.choropleth(df_mil, locations="name", locationmode="country names",
                                 color="Value", hover_name="name",
                                 color_continuous_scale=px.colors.sequential.Viridis)
@@ -202,7 +187,6 @@ with tab1:
         fig_map.update_layout(height=340, geo=dict(bgcolor='rgba(0,0,0,0)', showframe=False))
         st.plotly_chart(fig_map, use_container_width=True, config={'displayModeBar': False})
         
-        # Ranking Bars
         df_top10 = df_mil.sort_values(by='Value', ascending=False).head(10)
         fig_bar = px.bar(df_top10, x='Value', y='name', color='region', orientation='h',
                          color_discrete_sequence=px.colors.qualitative.Bold,
@@ -211,7 +195,7 @@ with tab1:
         fig_bar.update_layout(height=340, showlegend=False, yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
     else:
-        st.warning("Database contains no reporting entities for this year's index.")
+        st.warning("Database contains no reporting entities.")
 
 # ==========================================
 # TAB 2: ARMS FLOW
@@ -295,7 +279,7 @@ with tab4:
         st.warning("Insufficient overlapping records.")
 
 # ==========================================
-# TAB 5: COMPACT REAL-TIME INTEL WIRE
+# TAB 5: INTEL WIRE
 # ==========================================
 with tab5:
     try:
