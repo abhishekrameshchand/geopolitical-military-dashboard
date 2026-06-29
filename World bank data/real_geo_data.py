@@ -8,54 +8,73 @@ import numpy as np
 
 # Responsive page configurations
 st.set_page_config(
-    page_title="GeoIntel Dashboard", 
-    page_icon="🌍", 
+    page_title="GeoIntel Modern Dashboard", 
+    page_icon="⚡", 
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# --- CLEAN INDUSTRIAL SAAS STYLING ---
+# --- MODERN COLORFUL GLASSMORPHISM STYLING ---
 st.markdown("""
     <style>
+    /* Deep space indigo fluid gradient background */
     [data-testid="stAppViewContainer"], .main {
-        background-color: #0E131F !important;
+        background: radial-gradient(circle at 50% 10%, #1E1B4B 0%, #090714 80%) !important;
         color: #F3F4F6 !important;
     }
     [data-testid="stHeader"] {
         background: transparent !important;
     }
-    .metric-card {
-        background: #161F30 !important;
-        border: 1px solid #23324D !important;
-        border-radius: 10px;
-        padding: 20px;
+    
+    /* Neon & Gradient Styled Metric Display Cards */
+    .metric-card-coral {
+        background: linear-gradient(135deg, rgba(254, 242, 242, 0.08) 0%, rgba(220, 38, 38, 0.05) 100%) !important;
+        border: 1px solid rgba(239, 68, 68, 0.35) !important;
+        border-radius: 12px;
+        padding: 22px;
         margin-bottom: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 32px 0 rgba(239, 68, 68, 0.15);
     }
+    .metric-card-emerald {
+        background: linear-gradient(135deg, rgba(240, 253, 250, 0.08) 0%, rgba(5, 150, 105, 0.05) 100%) !important;
+        border: 1px solid rgba(16, 185, 129, 0.35) !important;
+        border-radius: 12px;
+        padding: 22px;
+        margin-bottom: 12px;
+        box-shadow: 0 8px 32px 0 rgba(16, 185, 129, 0.15);
+    }
+    .metric-card-cyan {
+        background: linear-gradient(135deg, rgba(236, 254, 255, 0.08) 0%, rgba(13, 148, 136, 0.05) 100%) !important;
+        border: 1px solid rgba(6, 182, 212, 0.35) !important;
+        border-radius: 12px;
+        padding: 22px;
+        margin-bottom: 12px;
+        box-shadow: 0 8px 32px 0 rgba(6, 182, 212, 0.15);
+    }
+    
     .metric-title {
         color: #9CA3AF;
         font-size: 11px;
         text-transform: uppercase;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.1em;
         font-weight: 700;
     }
     .metric-value {
         color: #FFFFFF;
-        font-size: 32px;
+        font-size: 34px;
         font-weight: 800;
         margin-top: 4px;
     }
-    .metric-delta {
-        font-size: 13px;
-        font-weight: 600;
-        margin-top: 6px;
-    }
+    
+    /* Sleek News Stream Blocks with Indigo Borders */
     .news-card {
-        background: #161F30;
-        border: 1px solid #23324D;
+        background: rgba(30, 27, 75, 0.45);
+        border: 1px solid rgba(99, 102, 241, 0.25);
+        border-left: 5px solid #6366F1;
         border-radius: 8px;
         padding: 20px;
         margin-bottom: 14px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
     .news-title {
         color: #FFFFFF;
@@ -64,47 +83,62 @@ st.markdown("""
         margin-bottom: 6px;
     }
     .news-desc {
-        color: #9CA3AF;
+        color: #D1D5DB;
         font-size: 13px;
         line-height: 1.5;
-        margin-bottom: 12px;
     }
     .news-link {
-        color: #3B82F6;
+        color: #818CF8;
         text-decoration: none;
         font-weight: bold;
-        font-size: 13px;
     }
+    
+    /* Premium Cyber Gradient Top App Panel Bar */
     .app-header {
-        background: #111827;
-        border: 1px solid #1F2937;
-        border-radius: 10px;
-        padding: 24px;
-        margin-bottom: 24px;
+        background: linear-gradient(90deg, #312E81 0%, #1E1B4B 50%, #0F172A 100%);
+        border: 1px solid rgba(99, 102, 241, 0.4);
+        border-radius: 14px;
+        padding: 28px;
+        margin-bottom: 26px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Elegant Custom Styling for Selection Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background-color: rgba(30, 27, 75, 0.4) !important;
+        border: 1px solid rgba(99, 102, 241, 0.2) !important;
+        border-radius: 6px 6px 0px 0px;
+        padding: 10px 20px !important;
+        color: #9CA3AF !important;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #4F46E5 !important;
+        color: white !important;
+        border-color: #6366F1 !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
 st.markdown("""
     <div class="app-header">
-        <h1 style="color:white; margin:0; font-size:28px; font-weight:800; letter-spacing:-0.02em;">🌍 GEOINTEL COMMAND</h1>
-        <p style="color:#9CA3AF; margin:4px 0 0 0; font-size:14px; font-weight:400;">Strategic Sovereign Risk Indices & Forecast Pipelines</p>
+        <h1 style="color:white; margin:0; font-size:32px; font-weight:900; letter-spacing:-0.03em; background: linear-gradient(to right, #FFFFFF, #818CF8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">⚡ GEOINTEL COMMAND OS</h1>
+        <p style="color:#A5B4FC; margin:6px 0 0 0; font-size:14px; font-weight:500; letter-spacing: 0.05em;">PREMIUM MULTI-DOMAIN VISUALIZATION PLATFORM</p>
     </div>
 """, unsafe_allow_html=True)
 
-# --- SAFE DATA FETCHING ENGINE ---
+# --- CACHED DATA FETCHING ---
 @st.cache_data
 def get_wb_data(indicator, year):
     try:
         series = wb.get_series(indicator, date=str(year), id_or_value='value')
         df_raw = pd.DataFrame(series).reset_index()
-        
         if df_raw.empty:
             return pd.DataFrame()
-            
         val_col = df_raw.columns[-1]
         df_raw = df_raw.rename(columns={val_col: 'Value'})
-        
         countries = pd.DataFrame(wb.get_countries()).reset_index()
         
         match_col = None
@@ -122,27 +156,28 @@ def get_wb_data(indicator, year):
     except Exception:
         return pd.DataFrame()
 
-# Sidebar Setup
-st.sidebar.markdown("### 🎛️ Parameters")
-selected_year = st.sidebar.slider("Timeline Horizon:", min_value=1990, max_value=2022, value=2022)
+# Sidebar Control
+st.sidebar.markdown("### 🎛️ Operational Settings")
+selected_year = st.sidebar.slider("Timeline Control:", min_value=1990, max_value=2022, value=2022)
 
 # --- CREATING SECTOR TABS ---
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊 Defense Budgets", 
-    "🚀 Arms Flow", 
-    "⚔️ AI Projections", 
-    "🧠 Policy Dilemmas",
-    "📰 Intel Wire"
+    "🚀 Arms Flows", 
+    "⚔️ AI Trajectories", 
+    "🧠 Strategic Trade-offs",
+    "📰 Intel Terminal"
 ])
 
 df_mil = get_wb_data('MS.MIL.XPND.GD.ZS', selected_year)
 
-clean_plotly_layout = {
+# Plotly layout optimized for colorful high contrast
+vibrant_layout = {
     "template": "plotly_dark",
     "paper_bgcolor": "rgba(0,0,0,0)",
     "plot_bgcolor": "rgba(0,0,0,0)",
-    "margin": dict(l=8, r=8, t=35, b=8),
-    "font": {"family": "sans-serif", "size": 11}
+    "margin": dict(l=10, r=10, t=40, b=10),
+    "font": {"family": "sans-serif", "size": 12, "color": "#E5E7EB"}
 }
 
 # ==========================================
@@ -155,59 +190,63 @@ with tab1:
         
         m_col1, m_col2, m_col3 = st.columns([1, 1, 1])
         with m_col1:
-            st.markdown(f"""<div class="metric-card">
-                <div class="metric-title">Peak Allocation</div>
+            st.markdown(f"""<div class="metric-card-coral">
+                <div class="metric-title">🔥 Peak Allocation</div>
                 <div class="metric-value">{top_country['Value']:.1f}%</div>
-                <div class="metric-delta" style="color:#EF4444;">▲ {top_country['name']}</div>
+                <div style="color:#FCA5A5; font-size:13px; font-weight:600; margin-top:4px;">{top_country['name']}</div>
             </div>""", unsafe_allow_html=True)
         with m_col2:
-            st.markdown(f"""<div class="metric-card">
-                <div class="metric-title">Global Mean</div>
+            st.markdown(f"""<div class="metric-card-emerald">
+                <div class="metric-title">⚡ Global Average</div>
                 <div class="metric-value">{global_mean:.2f}%</div>
-                <div class="metric-delta" style="color:#10B981;">Baseline Center</div>
+                <div style="color:#6EE7B7; font-size:13px; font-weight:600; margin-top:4px;">System Baseline</div>
             </div>""", unsafe_allow_html=True)
         with m_col3:
-            st.markdown(f"""<div class="metric-card">
-                <div class="metric-title">Nations Indexed</div>
+            st.markdown(f"""<div class="metric-card-cyan">
+                <div class="metric-title">🌐 Active Track</div>
                 <div class="metric-value">{len(df_mil)}</div>
-                <div class="metric-delta" style="color:#3B82F6;">Verified Entities</div>
+                <div style="color:#67E8F9; font-size:13px; font-weight:600; margin-top:4px;">Sovereign Nodes</div>
             </div>""", unsafe_allow_html=True)
             
         st.markdown("<br>", unsafe_allow_html=True)
         
+        # High intensity neon spectrum choropleth
         fig_map = px.choropleth(df_mil, locations="name", locationmode="country names",
                                 color="Value", hover_name="name",
-                                color_continuous_scale=px.colors.sequential.Cividis)
-        fig_map.update_layout(**clean_plotly_layout)
-        fig_map.update_layout(height=340, geo=dict(bgcolor='rgba(0,0,0,0)', showframe=False))
+                                color_continuous_scale=px.colors.sequential.Electric)
+        fig_map.update_layout(**vibrant_layout)
+        fig_map.update_layout(height=360, geo=dict(bgcolor='rgba(0,0,0,0)', showframe=False, projection_type="natural earth"))
         st.plotly_chart(fig_map, use_container_width=True, config={'displayModeBar': False})
         
+        # High dynamic horizontal ranks chart
         df_top10 = df_mil.sort_values(by='Value', ascending=False).head(10)
-        fig_bar = px.bar(df_top10, x='Value', y='name', color='region', orientation='h',
+        fig_bar = px.bar(df_top10, x='Value', y='name', color='Value', orientation='h',
+                         color_continuous_scale=px.colors.sequential.Plasma,
                          labels={'Value': 'Spend (% GDP)', 'name': ''})
-        fig_bar.update_layout(**clean_plotly_layout)
-        fig_bar.update_layout(height=340, showlegend=False, yaxis={'categoryorder':'total ascending'})
+        fig_bar.update_layout(**vibrant_layout)
+        fig_bar.update_layout(height=360, coloraxis_showscale=False, yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
     else:
-        st.warning("No reporting entities found.")
+        st.warning("No reporting data streams available.")
 
 # ==========================================
-# TAB 2: ARMS FLOW
+# TAB 2: ARMS FLOWS
 # ==========================================
 with tab2:
     df_arms = get_wb_data('MS.MIL.MPRT.KD', selected_year)
     if isinstance(df_arms, pd.DataFrame) and not df_arms.empty:
         df_arms_top10 = df_arms.sort_values(by='Value', ascending=False).head(10)
-        fig_arms = px.bar(df_arms_top10, x='Value', y='name', color='region', orientation='h',
-                          labels={'Value': 'Import Volume ($)', 'name': ''})
-        fig_arms.update_layout(**clean_plotly_layout)
-        fig_arms.update_layout(height=360, showlegend=False, yaxis={'categoryorder':'total ascending'})
+        fig_arms = px.bar(df_arms_top10, x='Value', y='name', color='Value', orientation='h',
+                          color_continuous_scale=px.colors.sequential.Viridis,
+                          labels={'Value': 'Import Capital Volume (USD)', 'name': ''})
+        fig_arms.update_layout(**vibrant_layout)
+        fig_arms.update_layout(height=380, coloraxis_showscale=False, yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig_arms, use_container_width=True, config={'displayModeBar': False})
     else:
-        st.warning("No arms flow records found for this year.")
+        st.warning("No dynamic arms procurement flows mapped.")
 
 # ==========================================
-# TAB 3: AI PROJECTIONS
+# TAB 3: AI TRAJECTORIES
 # ==========================================
 with tab3:
     if isinstance(df_mil, pd.DataFrame) and not df_mil.empty:
@@ -217,9 +256,9 @@ with tab3:
         
     c1, c2 = st.columns(2)
     with c1:
-        country_a = st.selectbox("Entity Alpha:", all_countries, index=0)
+        country_a = st.selectbox("Select Target Nation Alpha:", all_countries, index=0)
     with c2:
-        country_b = st.selectbox("Entity Beta:", all_countries, index=min(1, len(all_countries)-1))
+        country_b = st.selectbox("Select Target Nation Beta:", all_countries, index=min(1, len(all_countries)-1))
         
     if country_a and country_b:
         try:
@@ -249,17 +288,18 @@ with tab3:
             
             if forecast_data:
                 df_forecast = pd.DataFrame(forecast_data)
+                # Neon Blue vs Vivid Hot Fuchsia/Pink lines
                 fig_trend = px.line(df_forecast, x='Year', y='Spend', color='Country', line_dash='Type',
-                                    color_discrete_sequence=['#3B82F6', '#EF4444'],
-                                    labels={'Spend': 'Allocation Trend (% GDP)'})
-                fig_trend.update_layout(**clean_plotly_layout)
-                fig_trend.update_layout(height=340, legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5))
+                                    color_discrete_sequence=['#38BDF8', '#F43F5E'],
+                                    labels={'Spend': 'Allocation Volume (% GDP)'})
+                fig_trend.update_layout(**vibrant_layout)
+                fig_trend.update_layout(height=360, legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5))
                 st.plotly_chart(fig_trend, use_container_width=True, config={'displayModeBar': False})
         except Exception as e:
-            st.error(f"Prediction engine fault: {e}")
+            st.error(f"Prediction matrix run fault: {e}")
 
 # ==========================================
-# TAB 4: POLICY DILEMMAS
+# TAB 4: STRATEGIC TRADE-OFFS
 # ==========================================
 with tab4:
     df_edu = get_wb_data('SE.XPD.TOTL.GB.ZS', selected_year)
@@ -268,15 +308,16 @@ with tab4:
         df_tradeoff = df_tradeoff.rename(columns={'Value_Mil': 'Military Burden (% GDP)', 'Value_Edu': 'Education Investment (% Budget)'})
         
         fig_scatter = px.scatter(df_tradeoff, x='Military Burden (% GDP)', y='Education Investment (% Budget)',
-                                 color='region', hover_name='name')
-        fig_scatter.update_layout(**clean_plotly_layout)
-        fig_scatter.update_layout(height=350, showlegend=False)
+                                 color='region', hover_name='name', size='Military Burden (% GDP)', size_max=15,
+                                 color_discrete_sequence=px.colors.qualitative.Pastel)
+        fig_scatter.update_layout(**vibrant_layout)
+        fig_scatter.update_layout(height=380)
         st.plotly_chart(fig_scatter, use_container_width=True, config={'displayModeBar': False})
     else:
-        st.warning("Insufficient structural records overlapping for this timeline window.")
+        st.warning("Insufficient overlapping records registered for this specific loop.")
 
 # ==========================================
-# TAB 5: INTEL WIRE
+# TAB 5: REAL-TIME INTEL TERMINAL
 # ==========================================
 with tab5:
     try:
@@ -298,12 +339,12 @@ with tab5:
                 <div class="news-card">
                     <div class="news-title">🛑 {title}</div>
                     <div class="news-desc">{desc}</div>
-                    <div class="news-meta">
-                        <span>📅 {clean_date}</span>
-                        <a class="news-link" href="{link}" target="_blank">Review Intel →</a>
+                    <div class="news-meta" style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 8px; color: #9CA3AF;">
+                        <span>📅 Broadcasted: {clean_date}</span>
+                        <a class="news-link" href="{link}" target="_blank">Review Full Intel →</a>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
             count += 1
     except Exception:
-        st.info("System feed is offline.")
+        st.info("Dynamic news feeds stream offline.")
