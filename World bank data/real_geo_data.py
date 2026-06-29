@@ -99,7 +99,6 @@ def get_wb_data(indicator, year):
         series = wb.get_series(indicator, date=str(year), id_or_value='value')
         df_raw = pd.DataFrame(series).reset_index()
         
-        # Safe column tracking to prevent AttributeError
         if df_raw.empty:
             return pd.DataFrame()
             
@@ -185,7 +184,7 @@ with tab1:
         
         df_top10 = df_mil.sort_values(by='Value', ascending=False).head(10)
         fig_bar = px.bar(df_top10, x='Value', y='name', color='region', orientation='h',
-                         color_discrete_sequence=px.colors.qualitative.Muted,
+                         color_discrete_sequence=px.colors.qualitative.muted,
                          labels={'Value': 'Spend (% GDP)', 'name': ''})
         fig_bar.update_layout(**clean_plotly_layout)
         fig_bar.update_layout(height=340, showlegend=False, yaxis={'categoryorder':'total ascending'})
@@ -201,7 +200,7 @@ with tab2:
     if isinstance(df_arms, pd.DataFrame) and not df_arms.empty:
         df_arms_top10 = df_arms.sort_values(by='Value', ascending=False).head(10)
         fig_arms = px.bar(df_arms_top10, x='Value', y='name', color='region', orientation='h',
-                          color_discrete_sequence=px.colors.qualitative.Muted,
+                          color_discrete_sequence=px.colors.qualitative.muted,
                           labels={'Value': 'Import Volume ($)', 'name': ''})
         fig_arms.update_layout(**clean_plotly_layout)
         fig_arms.update_layout(height=360, showlegend=False, yaxis={'categoryorder':'total ascending'})
