@@ -17,7 +17,6 @@ st.set_page_config(
 # --- CLEAN INDUSTRIAL SAAS STYLING ---
 st.markdown("""
     <style>
-    /* Premium Slate Background */
     [data-testid="stAppViewContainer"], .main {
         background-color: #0E131F !important;
         color: #F3F4F6 !important;
@@ -25,8 +24,6 @@ st.markdown("""
     [data-testid="stHeader"] {
         background: transparent !important;
     }
-    
-    /* Clean Glassmorphism Metric Cards */
     .metric-card {
         background: #161F30 !important;
         border: 1px solid #23324D !important;
@@ -53,8 +50,6 @@ st.markdown("""
         font-weight: 600;
         margin-top: 6px;
     }
-    
-    /* Clean Structured News Blocks */
     .news-card {
         background: #161F30;
         border: 1px solid #23324D;
@@ -80,8 +75,6 @@ st.markdown("""
         font-weight: bold;
         font-size: 13px;
     }
-    
-    /* Sleek Top Header Panel */
     .app-header {
         background: #111827;
         border: 1px solid #1F2937;
@@ -92,7 +85,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Application Title Block
 st.markdown("""
     <div class="app-header">
         <h1 style="color:white; margin:0; font-size:28px; font-weight:800; letter-spacing:-0.02em;">🌍 GEOINTEL COMMAND</h1>
@@ -100,15 +92,21 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- CACHED DATA FETCHING ---
+# --- SAFE DATA FETCHING ENGINE ---
 @st.cache_data
 def get_wb_data(indicator, year):
     try:
         series = wb.get_series(indicator, date=str(year), id_or_value='value')
-        df_raw = series.reset_index()
+        df_raw = pd.DataFrame(series).reset_index()
+        
+        # Safe column tracking to prevent AttributeError
+        if df_raw.empty:
+            return pd.DataFrame()
+            
         val_col = df_raw.columns[-1]
         df_raw = df_raw.rename(columns={val_col: 'Value'})
-        countries = wb.get_countries().reset_index()
+        
+        countries = pd.DataFrame(wb.get_countries()).reset_index()
         
         match_col = None
         for col in df_raw.columns:
@@ -140,7 +138,6 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 df_mil = get_wb_data('MS.MIL.XPND.GD.ZS', selected_year)
 
-# Professional dark styling matrix for Plotly
 clean_plotly_layout = {
     "template": "plotly_dark",
     "paper_bgcolor": "rgba(0,0,0,0)",
@@ -153,7 +150,7 @@ clean_plotly_layout = {
 # TAB 1: DEFENSE BUDGET METRICS & MAP
 # ==========================================
 with tab1:
-    if not df_mil.empty:
+    if isinstance(df_mil, pd.DataFrame) and not df_mil.empty:
         top_country = df_mil.sort_values(by='Value', ascending=False).iloc[0]
         global_mean = df_mil['Value'].mean()
         
@@ -201,7 +198,7 @@ with tab1:
 # ==========================================
 with tab2:
     df_arms = get_wb_data('MS.MIL.MPRT.KD', selected_year)
-    if not df_arms.empty:
+    if isinstance(df_arms, pd.DataFrame) and not df_arms.empty:
         df_arms_top10 = df_arms.sort_values(by='Value', ascending=False).head(10)
         fig_arms = px.bar(df_arms_top10, x='Value', y='name', color='region', orientation='h',
                           color_discrete_sequence=px.colors.qualitative.Muted,
@@ -210,23 +207,27 @@ with tab2:
         fig_arms.update_layout(height=360, showlegend=False, yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig_arms, use_container_width=True, config={'displayModeBar': False})
     else:
-        st.warning("No data found for this year.")
+        st.warning("No arms flow records found for this year.")
 
 # ==========================================
-# TAB 3: REGRESSION FORECAST MODEL
+# TAB 3: AI PROJECTIONS
 # ==========================================
 with tab3:
-    all_countries = sorted(df_mil['name'].unique()) if not df_mil.empty else ["India", "United States", "China"]
+    if isinstance(df_mil, pd.DataFrame) and not df_mil.empty:
+        all_countries = sorted(df_mil['name'].unique())
+    else:
+        all_countries = ["India", "United States", "China"]
+        
     c1, c2 = st.columns(2)
     with c1:
-        country_a = st.selectbox("Entity Alpha:", all_countries, index=all_countries.index("India") if "India" in all_countries else 0)
+        country_a = st.selectbox("Entity Alpha:", all_countries, index=0)
     with c2:
-        country_b = st.selectbox("Entity Beta:", all_countries, index=all_countries.index("United States") if "United States" in all_countries else 1)
+        country_b = st.selectbox("Entity Beta:", all_countries, index=min(1, len(all_countries)-1))
         
     if country_a and country_b:
         try:
             hist_series = wb.get_series('MS.MIL.XPND.GD.ZS', id_or_value='value')
-            hist_df = hist_series.reset_index()
+            hist_df = pd.DataFrame(hist_series).reset_index()
             h_val = hist_df.columns[-1]
             h_c = hist_df.columns[0]
             
@@ -261,11 +262,11 @@ with tab3:
             st.error(f"Prediction engine fault: {e}")
 
 # ==========================================
-# TAB 4: SOCIO-ECONOMIC MATRIX
+# TAB 4: POLICY DILEMMAS
 # ==========================================
 with tab4:
     df_edu = get_wb_data('SE.XPD.TOTL.GB.ZS', selected_year)
-    if not df_mil.empty and not df_edu.empty:
+    if isinstance(df_mil, pd.DataFrame) and not df_mil.empty and isinstance(df_edu, pd.DataFrame) and not df_edu.empty:
         df_tradeoff = pd.merge(df_mil[['name', 'Value', 'region']], df_edu[['name', 'Value']], on='name', suffixes=('_Mil', '_Edu'))
         df_tradeoff = df_tradeoff.rename(columns={'Value_Mil': 'Military Burden (% GDP)', 'Value_Edu': 'Education Investment (% Budget)'})
         
@@ -275,10 +276,10 @@ with tab4:
         fig_scatter.update_layout(height=350, showlegend=False)
         st.plotly_chart(fig_scatter, use_container_width=True, config={'displayModeBar': False})
     else:
-        st.warning("Insufficient records available.")
+        st.warning("Insufficient structural records overlapping for this timeline window.")
 
 # ==========================================
-# TAB 5: INTEL WIRE (FIXED BACKEND REFERENCE)
+# TAB 5: INTEL WIRE
 # ==========================================
 with tab5:
     try:
