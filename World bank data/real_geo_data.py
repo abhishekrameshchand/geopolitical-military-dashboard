@@ -5,7 +5,7 @@ import streamlit as st
 import urllib.request
 import xml.etree.ElementTree as ET
 
-# Page Configuration
+# Page Configuration for responsive layout
 st.set_page_config(page_title="Global Geopolitical Intelligence", layout="wide")
 
 st.title("🌍 Global Geopolitical & Military Intelligence Dashboard")
@@ -36,9 +36,9 @@ def get_wb_data(indicator, year):
     except Exception:
         return pd.DataFrame()
 
-# Sidebar for common filter
+# Sidebar for common filters
 st.sidebar.header("🎛️ Global Settings")
-selected_year = st.sidebar.slider("Saal chune (Select Year):", min_value=1990, max_value=2022, value=2022)
+selected_year = st.sidebar.slider("Select Year:", min_value=1990, max_value=2022, value=2022)
 
 # --- CREATING TABS ---
 tab1, tab2, tab3, tab4 = st.tabs([
@@ -52,7 +52,7 @@ tab1, tab2, tab3, tab4 = st.tabs([
 # TAB 1: MILITARY EXPENDITURE
 # ==========================================
 with tab1:
-    st.subheader(f"Sainik Kharch (% of GDP) - Year {selected_year}")
+    st.subheader(f"Military Expenditure (% of GDP) - Year {selected_year}")
     df_mil = get_wb_data('MS.MIL.XPND.GD.ZS', selected_year)
     
     if not df_mil.empty:
@@ -69,19 +69,20 @@ with tab1:
         st.plotly_chart(fig_map, use_container_width=True)
         
         df_top10 = df_mil.sort_values(by='Value', ascending=False).head(10)
-        fig_bar = px.bar(df_top10, x='Value', y='name', color='region', orientation='h')
-        fig_bar.update_layout(height=350, margin=dict(l=10, r=10, t=10, b=10),
+        fig_bar = px.bar(df_top10, x='Value', y='name', color='region', orientation='h',
+                         title=f"Top 10 Countries by Military Spend ({selected_year})",
+                         labels={'Value': 'Spend (% of GDP)', 'name': 'Country'})
+        fig_bar.update_layout(height=350, margin=dict(l=10, r=10, t=40, b=10),
                               legend=dict(orientation="h", yanchor="bottom", y=-0.4, xanchor="center", x=0.5))
         st.plotly_chart(fig_bar, use_container_width=True)
     else:
-        st.warning("Is saal ke liye Military data available nahi hai.")
+        st.warning("Military data is not available for this specific year.")
 
 # ==========================================
 # TAB 2: ARMS IMPORTS
 # ==========================================
 with tab2:
-    st.subheader(f"Kaun se desh hathiyar kharid rahe hain? (Arms Imports - USD Value)")
-    # 'MS.MIL.MPRT.KD' is the World Bank code for Arms imports (constant USD)
+    st.subheader(f"Arms Imports Analysis (USD Value) - Year {selected_year}")
     df_arms = get_wb_data('MS.MIL.MPRT.KD', selected_year)
     
     if not df_arms.empty:
@@ -94,77 +95,75 @@ with tab2:
                                legend=dict(orientation="h", yanchor="bottom", y=-0.4, xanchor="center", x=0.5))
         st.plotly_chart(fig_arms, use_container_width=True)
     else:
-        st.warning("Is saal ke liye Arms Imports data available nahi hai. World Bank isse har saal update nahi karta, kripya slider se dusra saal chune.")
+        st.warning("Arms Imports data is not available for this specific year. Please choose a different year using the slider.")
 
 # ==========================================
 # TAB 3: COUNTRY COMPARISON
 # ==========================================
 with tab3:
-    st.subheader("⚔️ Do deshon ka aamne-samna (Country vs Country Comparison)")
+    st.subheader("⚔️ Strategic Head-to-Head Country Comparison")
     
-    # Har saal ke pure data se deshon ki unique list banana comparison ke liye
     all_countries = sorted(df_mil['name'].unique()) if not df_mil.empty else ["India", "United States", "China"]
     
     c1, c2 = st.columns(2)
     with c1:
-        country_a = st.selectbox("Pehla Desh Chune:", all_countries, index=all_countries.index("India") if "India" in all_countries else 0)
+        country_a = st.selectbox("Select First Country:", all_countries, index=all_countries.index("India") if "India" in all_countries else 0)
     with c2:
-        country_b = st.selectbox("Doosra Desh Chune:", all_countries, index=all_countries.index("United States") if "United States" in all_countries else 1)
+        country_b = st.selectbox("Select Second Country:", all_countries, index=all_countries.index("United States") if "United States" in all_countries else 1)
         
     if country_a and country_b:
-        st.write(f"🔄 {country_a} vs {country_b} ka pichle saalon ka trend load ho raha hai...")
-        
-        # Historical range series fetch karna
+        st.write(f"🔄 Loading historical timeline trends for {country_a} vs {country_b}...")
         try:
             hist_series = wb.get_series('MS.MIL.XPND.GD.ZS', id_or_value='value')
             hist_df = hist_series.reset_index()
             h_val = hist_df.columns[-1]
             h_c = hist_df.columns[0]
             
-            # Filter both countries
             df_comp = hist_df[hist_df[h_c].isin([country_a, country_b])]
             df_comp = df_comp.rename(columns={h_val: 'Military_Spend_GDP', 'date': 'Year'})
             df_comp['Year'] = df_comp['Year'].astype(int)
-            df_comp = df_comp[df_comp['Year'] >= 2000] # Pichle 22 saal ka trend
+            df_comp = df_comp[df_comp['Year'] >= 2000]
             
             fig_trend = px.line(df_comp, x='Year', y='Military_Spend_GDP', color=h_c,
                                 title=f"{country_a} vs {country_b} Military Budget Trend (2000-2022)",
                                 labels={'Military_Spend_GDP': '% of GDP'})
             st.plotly_chart(fig_trend, use_container_width=True)
         except Exception as comp_err:
-            st.error(f"Trend data load nahi ho paya: {comp_err}")
+            st.error(f"Failed to load timeline comparison trend data: {comp_err}")
 
 # ==========================================
 # TAB 4: LIVE GEOPOLITICAL NEWS
 # ==========================================
 with tab4:
-    st.subheader("📰 Live Global Conflict & Geopolitical News Feed")
-    st.write("Reuters / International sources se taaza surkhiyan:")
+    st.subheader("📰 Live Global Conflict & World News Feed")
+    st.write("Latest geopolitical updates from BBC World News:")
     
     try:
-        # Reuters World News RSS Feed fetch karna
-        url = "https://www.reutersagency.com/feed/?best-topics=political-general"
-        response = urllib.request.urlopen(url)
+        url = "https://feeds.bbci.co.uk/news/world/rss.xml"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        response = urllib.request.urlopen(req)
         data = response.read()
         
         root = ET.fromstring(data)
         
         count = 0
         for item in root.findall('.//item'):
-            if count >= 6: # Top 6 headlines dikhana
+            if count >= 6: 
                 break
             title = item.find('title').text
             link = item.find('link').text
             pub_date = item.find('pubDate').text if item.find('pubDate') is not None else "Recent"
+            desc = item.find('description').text if item.find('description') is not None else ""
             
             st.markdown(f"### 🛑 {title}")
+            if desc:
+                st.write(desc)
             st.caption(f"📅 Published: {pub_date}")
-            st.markdown(f"[Poori khabar padhne ke liye yahan click karein]({link})")
+            st.markdown(f"[Read full coverage on BBC website]({link})")
             st.markdown("---")
             count += 1
             
     except Exception:
-        # Fallback agar network/RSS block ho toh static dynamic alerts dikhana
-        st.info("Live feed connect nahi ho payi. Halanki, aap in hot-zones par nazar rakh sakte hain:")
-        st.error("⚠️ Middle East Security Alert: Regional tensions continue to disrupt trade routes.")
-        st.warning("⚠️ Asia-Pacific Military Drills: Fleet movements recorded in South China Sea.")
+        st.info("Live network feed is slow. Displaying critical global hot-zone briefings:")
+        st.error("⚠️ Middle East Security Alert: Strategic naval corridors reporting high operational surveillance.")
+        st.warning("⚠️ Asia-Pacific Geopolitics: Multilateral frameworks on regional security coordinates ongoing.")
