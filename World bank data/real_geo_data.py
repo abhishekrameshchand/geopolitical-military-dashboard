@@ -1,25 +1,25 @@
 import pandas as pd
 import world_bank_data as wb
 import plotly.express as px
-import streamlit as st  # <-- Streamlit ko import kiya
+import streamlit as st
 
-# Streamlit ki screen par title aur loading message dikhana
+# 1. Streamlit screen par Title aur Loading message set karna
 st.title("Geopolitical & Military Dashboard")
 status_text = st.empty()
 status_text.write("🔄 World Bank se live data fetch ho raha hai... Isme thoda samay lag sakta hai.")
 
-# 1. Data lena
+# 2. World Bank se military expenditure ka data lena (2022 ka data)
 mil_series = wb.get_series('MS.MIL.XPND.GD.ZS', date='2022', id_or_value='value')
 mil_gdp = mil_series.reset_index()
 
-# 2. Column rename karna
+# 3. Last column ka naam badal kar 'Military_Share_of_GDP' rakhna
 value_col = mil_gdp.columns[-1]
 mil_gdp = mil_gdp.rename(columns={value_col: 'Military_Share_of_GDP'})
 
-# 3. Countries load karna
+# 4. Deshon ki list aur unke regions load karna
 countries = wb.get_countries().reset_index()
 
-# 4. Column match karna
+# 5. Automatically dhundhna ki kis column me deshon ke naam hain
 match_col = None
 for col in mil_gdp.columns:
     if str(col).lower() in ['country', 'name']:
@@ -29,41 +29,39 @@ for col in mil_gdp.columns:
 if not match_col:
     match_col = mil_gdp.columns[0]
 
-# 5. Merge karna
+# 6. Data ko merge aur clean karna
 df = pd.merge(countries[['region', 'name']], mil_gdp, left_on='name', right_on=match_col)
-
-# 6. Clean karna
 df = df.dropna(subset=['Military_Share_of_GDP'])
 df = df[df['region'] != 'Aggregates']
-df_top20 = df.sort_values(by='Military_Share_of_GDP', ascending=False).head(20)
 
-# Loading message hata kar graph dikhana
+# Mobile view ke liye Top 10 deshon ko nikalna (taaki screen par fit aaye)
+df_top10 = df.sort_values(by='Military_Share_of_GDP', ascending=False).head(10)
+
+# Loading message ko screen se hatana
 status_text.empty()
 
 # 7. Interactive Bar Chart banana
-fig = px.bar(df_top20, 
+fig = px.bar(df_top10, 
              x='Military_Share_of_GDP', 
              y='name', 
              color='region',
              orientation='h',
-             title='Top 20 Countries by Military Expenditure (% of GDP) in 2022',
+             title='Top 10 Countries by Military Expenditure (% of GDP) in 2022',
              labels={'Military_Share_of_GDP': 'Military Spend (% of GDP)', 'name': 'Country'})
 
-# Layout ko mobile-friendly banana
+# 8. Layout ko Mobile aur Desktop dono ke liye responsive banana
 fig.update_layout(
     yaxis={'categoryorder':'total ascending'},
-    height=600,  # Fix height taaki mobile par achhe se scroll ho
-    margin=dict(l=20, r=20, t=40, b=20),  # Margins kam kiye taaki space bache
+    height=450,  # Mobile screens ke liye perfect height
+    margin=dict(l=10, r=10, t=40, b=10),  # Side margins kam kiye taaki phone par katna band ho
     legend=dict(
-        orientation="h",  # Legend ko horizontal (h) kiya
+        orientation="h",  # Regions ke naam graph ke niche horizontal layout me aayenge
         yanchor="bottom",
-        y=-0.3,  # Graph ke neeche shift kiya
+        y=-0.4,
         xanchor="center",
         x=0.5
     )
 )
 
-# HTML file me save karne ke sath-sath Streamlit par graph show karna
-st.plotly_chart(fig, use_container_width=True)
-# HTML file me save karne ke sath-sath Streamlit par graph show karna
+# 9. Dashboard par graph show karna
 st.plotly_chart(fig, use_container_width=True)
