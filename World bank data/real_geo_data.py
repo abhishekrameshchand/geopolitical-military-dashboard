@@ -14,29 +14,26 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- FORCE INJECTING TRANSPARENT LAYERS ON ALL OVERRIDE BLOCKS ---
+# --- CLEAN INDUSTRIAL SAAS STYLING ---
 st.markdown("""
     <style>
-    /* Force background gradient across ALL layout layers */
-    [data-testid="stAppViewContainer"], .main, [data-testid="stHeader"] {
-        background: radial-gradient(circle at 50% 15%, #1F293D 0%, #0B0F17 85%) !important;
+    /* Premium Slate Background */
+    [data-testid="stAppViewContainer"], .main {
+        background-color: #0E131F !important;
         color: #F3F4F6 !important;
     }
+    [data-testid="stHeader"] {
+        background: transparent !important;
+    }
     
-    /* Modern SaaS Container Cards with Blue Neon Accents */
+    /* Clean Glassmorphism Metric Cards */
     .metric-card {
-        background: rgba(22, 29, 42, 0.85) !important;
-        border: 1px solid rgba(59, 130, 246, 0.25) !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
+        background: #161F30 !important;
+        border: 1px solid #23324D !important;
+        border-radius: 10px;
         padding: 20px;
         margin-bottom: 12px;
-        transition: all 0.3s ease;
-    }
-    .metric-card:hover {
-        border-color: #3B82F6 !important;
-        box-shadow: 0 0 15px rgba(59, 130, 246, 0.35) !important;
-        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     }
     .metric-title {
         color: #9CA3AF;
@@ -47,47 +44,48 @@ st.markdown("""
     }
     .metric-value {
         color: #FFFFFF;
-        font-size: 28px;
+        font-size: 32px;
         font-weight: 800;
         margin-top: 4px;
     }
     .metric-delta {
         font-size: 13px;
         font-weight: 600;
-        margin-top: 4px;
+        margin-top: 6px;
     }
     
-    /* Modern News Stream Cards */
+    /* Clean Structured News Blocks */
     .news-card {
-        background: rgba(17, 23, 35, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-left: 4px solid #3B82F6;
-        border-radius: 4px 12px 12px 4px;
-        padding: 18px;
+        background: #161F30;
+        border: 1px solid #23324D;
+        border-radius: 8px;
+        padding: 20px;
         margin-bottom: 14px;
     }
     .news-title {
-        color: #F3F4F6;
+        color: #FFFFFF;
         font-size: 16px;
         font-weight: 600;
+        margin-bottom: 6px;
     }
     .news-desc {
         color: #9CA3AF;
         font-size: 13px;
         line-height: 1.5;
+        margin-bottom: 12px;
     }
     .news-link {
         color: #3B82F6;
         text-decoration: none;
         font-weight: bold;
+        font-size: 13px;
     }
     
-    /* Cyber Command Header Panel */
+    /* Sleek Top Header Panel */
     .app-header {
-        background: linear-gradient(135deg, #1E2640 0%, #0F1424 100%);
-        border: 1px solid rgba(59, 130, 246, 0.3);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-        border-radius: 14px;
+        background: #111827;
+        border: 1px solid #1F2937;
+        border-radius: 10px;
         padding: 24px;
         margin-bottom: 24px;
     }
@@ -97,8 +95,8 @@ st.markdown("""
 # Application Title Block
 st.markdown("""
     <div class="app-header">
-        <h1 style="color:white; margin:0; font-size:30px; font-weight:800; letter-spacing:-0.03em;">🌐 GEOINTEL COMMAND</h1>
-        <p style="color:#9CA3AF; margin:4px 0 0 0; font-size:14px; font-weight:500;">Sovereign Intelligence Systems & Predictive Analytics Pipeline</p>
+        <h1 style="color:white; margin:0; font-size:28px; font-weight:800; letter-spacing:-0.02em;">🌍 GEOINTEL COMMAND</h1>
+        <p style="color:#9CA3AF; margin:4px 0 0 0; font-size:14px; font-weight:400;">Strategic Sovereign Risk Indices & Forecast Pipelines</p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -128,7 +126,7 @@ def get_wb_data(indicator, year):
         return pd.DataFrame()
 
 # Sidebar Setup
-st.sidebar.markdown("### 🎛️ Operational Parameters")
+st.sidebar.markdown("### 🎛️ Parameters")
 selected_year = st.sidebar.slider("Timeline Horizon:", min_value=1990, max_value=2022, value=2022)
 
 # --- CREATING SECTOR TABS ---
@@ -142,7 +140,8 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 df_mil = get_wb_data('MS.MIL.XPND.GD.ZS', selected_year)
 
-vibrant_plotly_layout = {
+# Professional dark styling matrix for Plotly
+clean_plotly_layout = {
     "template": "plotly_dark",
     "paper_bgcolor": "rgba(0,0,0,0)",
     "plot_bgcolor": "rgba(0,0,0,0)",
@@ -163,39 +162,41 @@ with tab1:
             st.markdown(f"""<div class="metric-card">
                 <div class="metric-title">Peak Allocation</div>
                 <div class="metric-value">{top_country['Value']:.1f}%</div>
-                <div class="metric-delta" style="color:#FF4B4B;">▲ {top_country['name']}</div>
+                <div class="metric-delta" style="color:#EF4444;">▲ {top_country['name']}</div>
             </div>""", unsafe_allow_html=True)
         with m_col2:
             st.markdown(f"""<div class="metric-card">
                 <div class="metric-title">Global Mean</div>
                 <div class="metric-value">{global_mean:.2f}%</div>
-                <div class="metric-delta" style="color:#6EE7B7;">⚡ System Baseline</div>
+                <div class="metric-delta" style="color:#10B981;">Baseline Center</div>
             </div>""", unsafe_allow_html=True)
         with m_col3:
             st.markdown(f"""<div class="metric-card">
                 <div class="metric-title">Nations Indexed</div>
                 <div class="metric-value">{len(df_mil)}</div>
-                <div class="metric-delta" style="color:#3B82F6;">✓ Integrity Verified</div>
+                <div class="metric-delta" style="color:#3B82F6;">Verified Entities</div>
             </div>""", unsafe_allow_html=True)
             
         st.markdown("<br>", unsafe_allow_html=True)
         
+        # High-contrast mapping color scale
         fig_map = px.choropleth(df_mil, locations="name", locationmode="country names",
                                 color="Value", hover_name="name",
-                                color_continuous_scale=px.colors.sequential.Viridis)
-        fig_map.update_layout(**vibrant_plotly_layout)
+                                color_continuous_scale=px.colors.sequential.Cividis)
+        fig_map.update_layout(**clean_plotly_layout)
         fig_map.update_layout(height=340, geo=dict(bgcolor='rgba(0,0,0,0)', showframe=False))
         st.plotly_chart(fig_map, use_container_width=True, config={'displayModeBar': False})
         
+        # Ranking Bars
         df_top10 = df_mil.sort_values(by='Value', ascending=False).head(10)
         fig_bar = px.bar(df_top10, x='Value', y='name', color='region', orientation='h',
-                         color_discrete_sequence=px.colors.qualitative.Bold,
+                         color_discrete_sequence=px.colors.qualitative.Muted,
                          labels={'Value': 'Spend (% GDP)', 'name': ''})
-        fig_bar.update_layout(**vibrant_plotly_layout)
+        fig_bar.update_layout(**clean_plotly_layout)
         fig_bar.update_layout(height=340, showlegend=False, yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig_bar, use_container_width=True, config={'displayModeBar': False})
     else:
-        st.warning("Database contains no reporting entities.")
+        st.warning("No reporting entities found.")
 
 # ==========================================
 # TAB 2: ARMS FLOW
@@ -205,9 +206,9 @@ with tab2:
     if not df_arms.empty:
         df_arms_top10 = df_arms.sort_values(by='Value', ascending=False).head(10)
         fig_arms = px.bar(df_arms_top10, x='Value', y='name', color='region', orientation='h',
-                          color_discrete_sequence=px.colors.qualitative.Prism,
-                          labels={'Value': 'Import Capital Volume ($)', 'name': ''})
-        fig_arms.update_layout(**vibrant_plotly_layout)
+                          color_discrete_sequence=px.colors.qualitative.Muted,
+                          labels={'Value': 'Import Volume ($)', 'name': ''})
+        fig_arms.update_layout(**clean_plotly_layout)
         fig_arms.update_layout(height=360, showlegend=False, yaxis={'categoryorder':'total ascending'})
         st.plotly_chart(fig_arms, use_container_width=True, config={'displayModeBar': False})
     else:
@@ -255,7 +256,7 @@ with tab3:
                 fig_trend = px.line(df_forecast, x='Year', y='Spend', color='Country', line_dash='Type',
                                     color_discrete_sequence=['#3B82F6', '#EF4444'],
                                     labels={'Spend': 'Allocation Trend (% GDP)'})
-                fig_trend.update_layout(**vibrant_plotly_layout)
+                fig_trend.update_layout(**clean_plotly_layout)
                 fig_trend.update_layout(height=340, legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5))
                 st.plotly_chart(fig_trend, use_container_width=True, config={'displayModeBar': False})
         except Exception as e:
@@ -272,11 +273,11 @@ with tab4:
         
         fig_scatter = px.scatter(df_tradeoff, x='Military Burden (% GDP)', y='Education Investment (% Budget)',
                                  color='region', hover_name='name')
-        fig_scatter.update_layout(**vibrant_plotly_layout)
+        fig_scatter.update_layout(**clean_plotly_layout)
         fig_scatter.update_layout(height=350, showlegend=False)
         st.plotly_chart(fig_scatter, use_container_width=True, config={'displayModeBar': False})
     else:
-        st.warning("Insufficient overlapping records.")
+        st.warning("Insufficient records available.")
 
 # ==========================================
 # TAB 5: INTEL WIRE
@@ -302,7 +303,7 @@ with tab5:
                     <div class="news-title">🛑 {title}</div>
                     <div class="news-desc">{desc}</div>
                     <div class="news-meta">
-                        <span>📅 Broadcasted: {clean_date}</span>
+                        <span>📅 {clean_date}</span>
                         <a class="news-link" href="{link}" target="_blank">Review Intel →</a>
                     </div>
                 </div>
