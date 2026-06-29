@@ -5,11 +5,20 @@ import streamlit as st
 import urllib.request
 import xml.etree.ElementTree as ET
 
-# Page Configuration for responsive layout
-st.set_page_config(page_title="Global Geopolitical Intelligence", layout="wide")
+# Premium responsive page configurations
+st.set_page_config(
+    page_title="Global Geopolitical Intelligence", 
+    page_icon="🌍", 
+    layout="wide"
+)
 
-st.title("🌍 Global Geopolitical & Military Intelligence Dashboard")
-st.markdown("Live analytics dashboard incorporating World Bank data & Real-time Global News")
+# Custom top banner mimicking intelligence command headers
+st.markdown("""
+    <div style="background-color:#1F2937; padding:20px; border-radius:10px; border-left: 5px solid #FF4B4B; margin-bottom:20px;">
+        <h1 style="color:white; margin:0;">🌍 Global Geopolitical & Military Intelligence Dashboard</h1>
+        <p style="color:#9CA3AF; margin:5px 0 0 0;">Live Tactical Analytics Feed • Integrating World Bank Systems & Real-Time Intelligence</p>
+    </div>
+""", unsafe_allow_html=True)
 
 # --- DATA LOADING & CACHING FUNCTION ---
 @st.cache_data
@@ -36,83 +45,101 @@ def get_wb_data(indicator, year):
     except Exception:
         return pd.DataFrame()
 
-# Sidebar for common filters
-st.sidebar.header("🎛️ Global Settings")
-selected_year = st.sidebar.slider("Select Year:", min_value=1990, max_value=2022, value=2022)
+# Sidebar Styling
+st.sidebar.markdown("### 🎛️ Tactical Controls")
+selected_year = st.sidebar.slider("Select Operational Year:", min_value=1990, max_value=2022, value=2022)
+st.sidebar.markdown("---")
+st.sidebar.info("💡 **Tip:** Switch tabs on the main screen to toggle between distinct analytical sectors.")
 
-# --- CREATING TABS ---
+# --- CREATING TABS WITH PREMIUM SPACING ---
 tab1, tab2, tab3, tab4 = st.tabs([
-    "📊 Military Spend", 
-    "🚀 Arms Imports", 
-    "⚔️ Country Comparison", 
-    "📰 Live Geopolitical News"
+    "📊 Military Spend Profile", 
+    "🚀 Arms Procurement Dynamics", 
+    "⚔️ Strategic Country Comparison", 
+    "📰 Global Intelligence Wire"
 ])
 
 # ==========================================
 # TAB 1: MILITARY EXPENDITURE
 # ==========================================
 with tab1:
-    st.subheader(f"Military Expenditure (% of GDP) - Year {selected_year}")
+    st.markdown(f"### 📊 Sovereign Military Expenditure (% of GDP) — FY {selected_year}")
     df_mil = get_wb_data('MS.MIL.XPND.GD.ZS', selected_year)
     
     if not df_mil.empty:
         col1, col2, col3 = st.columns(3)
         top_country = df_mil.sort_values(by='Value', ascending=False).iloc[0]
-        col1.metric("Highest Spender", top_country['name'], f"{top_country['Value']:.2f}% GDP")
-        col2.metric("Global Average", f"{df_mil['Value'].mean():.2f}% GDP")
-        col3.metric("Data Available For", f"{len(df_mil)} Countries")
         
+        with col1:
+            st.markdown(f"<div style='background-color:#1F2937; padding:15px; border-radius:8px; text-align:center;'><strong>Peak Allocation Country</strong><br><span style='color:#FF4B4B; font-size:20px; font-weight:bold;'>{top_country['name']}</span><br>({top_country['Value']:.2f}% GDP)</div>", unsafe_allow_html=True)
+        with col2:
+            st.markdown(f"<div style='background-color:#1F2937; padding:15px; border-radius:8px; text-align:center;'><strong>Global Mean Allocation</strong><br><span style='color:#3B82F6; font-size:20px; font-weight:bold;'>{df_mil['Value'].mean():.2f}% GDP</span><br>System Baseline</div>", unsafe_allow_html=True)
+        with col3:
+            st.markdown(f"<div style='background-color:#1F2937; padding:15px; border-radius:8px; text-align:center;'><strong>Data Points Tracked</strong><br><span style='color:#10B981; font-size:20px; font-weight:bold;'>{len(df_mil)} Nations</span><br>Verified Status</div>", unsafe_allow_html=True)
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Premium Dark Themed Map
         fig_map = px.choropleth(df_mil, locations="name", locationmode="country names",
                                 color="Value", hover_name="name",
-                                color_continuous_scale=px.colors.sequential.Plasma)
-        fig_map.update_layout(height=400, margin=dict(l=0, r=0, t=10, b=0))
+                                color_continuous_scale=px.colors.sequential.YlOrRd,
+                                template="plotly_dark")
+        fig_map.update_layout(
+            height=450, 
+            margin=dict(l=0, r=0, t=10, b=0),
+            geo=dict(bgcolor='rgba(0,0,0,0)', lakecolor='#1F2937', showlakes=True)
+        )
         st.plotly_chart(fig_map, use_container_width=True)
         
+        # Premium Dark Themed Bar Graph
         df_top10 = df_mil.sort_values(by='Value', ascending=False).head(10)
         fig_bar = px.bar(df_top10, x='Value', y='name', color='region', orientation='h',
-                         title=f"Top 10 Countries by Military Spend ({selected_year})",
-                         labels={'Value': 'Spend (% of GDP)', 'name': 'Country'})
-        fig_bar.update_layout(height=350, margin=dict(l=10, r=10, t=40, b=10),
-                              legend=dict(orientation="h", yanchor="bottom", y=-0.4, xanchor="center", x=0.5))
+                         title=f"Top 10 Global Defense Spenders (% of GDP) — {selected_year}",
+                         labels={'Value': 'Defense Spend (% of GDP)', 'name': 'Nation'},
+                         template="plotly_dark",
+                         color_discrete_sequence=px.colors.qualitative.Pastel)
+        fig_bar.update_layout(height=380, margin=dict(l=10, r=10, t=40, b=10),
+                              legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5))
         st.plotly_chart(fig_bar, use_container_width=True)
     else:
-        st.warning("Military data is not available for this specific year.")
+        st.warning("No defense allocation records matched for the selected calendar cycle.")
 
 # ==========================================
 # TAB 2: ARMS IMPORTS
 # ==========================================
 with tab2:
-    st.subheader(f"Arms Imports Analysis (USD Value) - Year {selected_year}")
+    st.markdown(f"### 🚀 International Arms Procurement Channels (USD Volume) — FY {selected_year}")
     df_arms = get_wb_data('MS.MIL.MPRT.KD', selected_year)
     
     if not df_arms.empty:
         df_arms_top10 = df_arms.sort_values(by='Value', ascending=False).head(10)
         
         fig_arms = px.bar(df_arms_top10, x='Value', y='name', color='region', orientation='h',
-                          title=f"Top 10 Arms Importers in {selected_year} (in constant USD)",
-                          labels={'Value': 'Import Value ($)', 'name': 'Country'})
+                          title=f"Top 10 Heavy Arms Procurement Volumes ({selected_year}) — Constant USD Values",
+                          labels={'Value': 'Aggregate Import Capital ($)', 'name': 'Nation'},
+                          template="plotly_dark",
+                          color_discrete_sequence=px.colors.qualitative.Safe)
         fig_arms.update_layout(height=400, margin=dict(l=10, r=10, t=40, b=10),
-                               legend=dict(orientation="h", yanchor="bottom", y=-0.4, xanchor="center", x=0.5))
+                               legend=dict(orientation="h", yanchor="bottom", y=-0.3, xanchor="center", x=0.5))
         st.plotly_chart(fig_arms, use_container_width=True)
     else:
-        st.warning("Arms Imports data is not available for this specific year. Please choose a different year using the slider.")
+        st.warning("Procurement metrics are currently unindexed for this cycle. Toggle the tactical timeline slider to locate adjacent data matrices.")
 
 # ==========================================
 # TAB 3: COUNTRY COMPARISON
 # ==========================================
 with tab3:
-    st.subheader("⚔️ Strategic Head-to-Head Country Comparison")
+    st.markdown("### ⚔️ Bilateral Strategic Trajectory Comparison")
     
     all_countries = sorted(df_mil['name'].unique()) if not df_mil.empty else ["India", "United States", "China"]
     
     c1, c2 = st.columns(2)
     with c1:
-        country_a = st.selectbox("Select First Country:", all_countries, index=all_countries.index("India") if "India" in all_countries else 0)
+        country_a = st.selectbox("Select Target Matrix Alpha:", all_countries, index=all_countries.index("India") if "India" in all_countries else 0)
     with c2:
-        country_b = st.selectbox("Select Second Country:", all_countries, index=all_countries.index("United States") if "United States" in all_countries else 1)
+        country_b = st.selectbox("Select Target Matrix Beta:", all_countries, index=all_countries.index("United States") if "United States" in all_countries else 1)
         
     if country_a and country_b:
-        st.write(f"🔄 Loading historical timeline trends for {country_a} vs {country_b}...")
         try:
             hist_series = wb.get_series('MS.MIL.XPND.GD.ZS', id_or_value='value')
             hist_df = hist_series.reset_index()
@@ -125,18 +152,20 @@ with tab3:
             df_comp = df_comp[df_comp['Year'] >= 2000]
             
             fig_trend = px.line(df_comp, x='Year', y='Military_Spend_GDP', color=h_c,
-                                title=f"{country_a} vs {country_b} Military Budget Trend (2000-2022)",
-                                labels={'Military_Spend_GDP': '% of GDP'})
+                                title=f"Bilateral Defense Spending Deviation Map (2000 - 2022)",
+                                labels={'Military_Spend_GDP': 'Allocation Value (% of GDP)'},
+                                template="plotly_dark")
+            fig_trend.update_layout(height=400)
             st.plotly_chart(fig_trend, use_container_width=True)
         except Exception as comp_err:
-            st.error(f"Failed to load timeline comparison trend data: {comp_err}")
+            st.error(f"Execution system aborted timeline tracking link: {comp_err}")
 
 # ==========================================
 # TAB 4: LIVE GEOPOLITICAL NEWS
 # ==========================================
 with tab4:
-    st.subheader("📰 Live Global Conflict & World News Feed")
-    st.write("Latest geopolitical updates from BBC World News:")
+    st.markdown("### 📰 Global Tactical Feed Wire")
+    st.caption("Live global situational intelligence network streaming via BBC World Framework:")
     
     try:
         url = "https://feeds.bbci.co.uk/news/world/rss.xml"
@@ -148,22 +177,25 @@ with tab4:
         
         count = 0
         for item in root.findall('.//item'):
-            if count >= 6: 
+            if count >= 5: 
                 break
             title = item.find('title').text
             link = item.find('link').text
-            pub_date = item.find('pubDate').text if item.find('pubDate') is not None else "Recent"
+            pub_date = item.find('pubDate').text if item.find('pubDate') is not None else "Recent Updates"
             desc = item.find('description').text if item.find('description') is not None else ""
             
-            st.markdown(f"### 🛑 {title}")
-            if desc:
-                st.write(desc)
-            st.caption(f"📅 Published: {pub_date}")
-            st.markdown(f"[Read full coverage on BBC website]({link})")
-            st.markdown("---")
+            # Rendering items inside tactical custom alerts / blocks
+            st.markdown(f"""
+                <div style="background-color:#1F2937; padding:15px; border-radius:6px; border-left:3px solid #3B82F6; margin-bottom:15px;">
+                    <h4 style="margin:0; color:#F3F4F6;">🛑 {title}</h4>
+                    <p style="color:#D1D5DB; font-size:14px; margin:5px 0;">{desc}</p>
+                    <span style="color:#9CA3AF; font-size:12px;">📅 Broadcasted: {pub_date}</span> | 
+                    <a href="{link}" target="_blank" style="color:#3B82F6; font-size:12px; text-decoration:none; font-weight:bold;">Review Operational Intel →</a>
+                </div>
+            """, unsafe_allow_html=True)
             count += 1
             
     except Exception:
-        st.info("Live network feed is slow. Displaying critical global hot-zone briefings:")
-        st.error("⚠️ Middle East Security Alert: Strategic naval corridors reporting high operational surveillance.")
-        st.warning("⚠️ Asia-Pacific Geopolitics: Multilateral frameworks on regional security coordinates ongoing.")
+        st.info("System failed to process digital handshake. Reverting to pre-cached security coordinates:")
+        st.error("🚨 **Regional Hotspot Alert:** Tactical surveillance tracking higher naval counts across transit lines.")
+        st.warning("⚠️ **Strategic Perimeter Warning:** Multilateral tactical coordination protocols currently deployed.")
