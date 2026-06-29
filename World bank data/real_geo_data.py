@@ -179,7 +179,6 @@ with tab1:
             
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # High-contrast mapping color scale
         fig_map = px.choropleth(df_mil, locations="name", locationmode="country names",
                                 color="Value", hover_name="name",
                                 color_continuous_scale=px.colors.sequential.Cividis)
@@ -187,7 +186,6 @@ with tab1:
         fig_map.update_layout(height=340, geo=dict(bgcolor='rgba(0,0,0,0)', showframe=False))
         st.plotly_chart(fig_map, use_container_width=True, config={'displayModeBar': False})
         
-        # Ranking Bars
         df_top10 = df_mil.sort_values(by='Value', ascending=False).head(10)
         fig_bar = px.bar(df_top10, x='Value', y='name', color='region', orientation='h',
                          color_discrete_sequence=px.colors.qualitative.Muted,
@@ -280,7 +278,7 @@ with tab4:
         st.warning("Insufficient records available.")
 
 # ==========================================
-# TAB 5: INTEL WIRE
+# TAB 5: INTEL WIRE (FIXED BACKEND REFERENCE)
 # ==========================================
 with tab5:
     try:
